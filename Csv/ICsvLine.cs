@@ -39,7 +39,7 @@ namespace Csv
         /// Gets the data for the specified named header.
         /// </summary>
         /// <param name="name">The name of the header.</param>
-        string this[string name] { get; }
+        string? this[string name] { get; }
 
         /// <summary>
         /// Gets the data for the specified indexed header.

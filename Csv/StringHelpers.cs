@@ -2,20 +2,13 @@
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 
-#if NETCOREAPP3_1 || NETSTANDARD2_1
 using MemoryText = System.ReadOnlyMemory<char>;
 using SpanText = System.ReadOnlySpan<char>;
-#else
-using MemoryText = System.String;
-using SpanText = System.String;
-#endif
 
 [assembly: InternalsVisibleTo("Csv.Tests")]
 
 namespace Csv
 {
-#if NETCOREAPP3_1 || NETSTANDARD2_1
-
     /// <summary>
     /// Extension methods for <see cref="ReadOnlyMemory{Char}"/> to handle common string operations.
     /// </summary>
@@ -129,8 +122,7 @@ namespace Csv
             return Regex.Match(new string(str), pattern).Value;
         }
 
-#if NETSTANDARD2_1
-        internal static ReadOnlyMemory<char> Trim(this ReadOnlyMemory<char> str)
+        internal static MemoryText Trim(this MemoryText str)
         {
             var span = str.Span;
             var start = 0;
@@ -154,47 +146,5 @@ namespace Csv
         {
             return (str1.AsString() + str2 + str3.AsString()).AsMemory();
         }
-#else
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static MemoryText Concat(MemoryText str1, string str2, MemoryText str3)
-        {
-            return string.Concat(str1.Span, str2.AsSpan(), str3.Span).AsMemory();
-        }
-#endif
     }
-#else
-    internal static class StringHelpers // NOTE: Extension methods are provided to reuse the same code
-    {
-        [MethodImpl((MethodImplOptions)256 /*MethodImplOptions.AggressiveInlining*/)]
-        public static string RegexMatch(SpanText str, string pattern)
-        {
-            return Regex.Match(str, pattern).Value;
-        }
-
-        [MethodImpl((MethodImplOptions)256 /*MethodImplOptions.AggressiveInlining*/)]
-        public static string AsString(this MemoryText str)
-        {
-            return str;
-        }
-
-        [MethodImpl((MethodImplOptions)256 /*MethodImplOptions.AggressiveInlining*/)]
-        public static SpanText AsSpan(this MemoryText str)
-        {
-            return str;
-        }
-
-        [MethodImpl((MethodImplOptions)256 /*MethodImplOptions.AggressiveInlining*/)]
-        public static MemoryText AsMemory(this string str)
-        {
-            return str;
-        }
-
-        [MethodImpl((MethodImplOptions)256 /*MethodImplOptions.AggressiveInlining*/)]
-        public static MemoryText Concat(MemoryText str1, string str2, MemoryText str3)
-        {
-            return (str1 + str2 + str3);
-        }
-    }
-
-#endif
 }
